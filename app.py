@@ -1,19 +1,17 @@
-from flask import Flask, render_template, request
+from flask import Flask
+import os
 from calculator import calculate
 
 app = Flask(__name__)
 
-@app.route("/", methods=["GET", "POST"])
-def index():
-    result = None
+@app.route("/")
+def home():
+    n1 = os.getenv("NUMBER1", "0")
+    n2 = os.getenv("NUMBER2", "0")
+    op = os.getenv("OPERATION", "add")
 
-    if request.method == "POST":
-        num1 = request.form["num1"]
-        num2 = request.form["num2"]
-        operation = request.form["operation"]
-        result = calculate(num1, num2, operation)
-
-    return render_template("index.html", result=result)
+    result = calculate(n1, n2, op)
+    return f"Result: {result}"
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(host="0.0.0.0", port=5000)
