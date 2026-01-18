@@ -6,6 +6,12 @@ pipeline {
         PYTHON_PATH = "C:\\Users\\Deva\\AppData\\Local\\Programs\\Python\\Python313\\python.exe"
     }
 
+    parameters {
+        string(name: 'NUMBER1', defaultValue: '0')
+        string(name: 'NUMBER2', defaultValue: '0')
+        choice(name: 'OPERATION', choices: ['add', 'subtract', 'multiply', 'divide'])
+    }
+
     stages {
 
         stage('Checkout Code') {
@@ -16,7 +22,6 @@ pipeline {
 
         stage('Build') {
             steps {
-                echo 'Creating virtual environment and installing dependencies'
                 bat """
                 %PYTHON_PATH% -m venv %VENV%
                 %VENV%\\Scripts\\python -m pip install --upgrade pip
@@ -27,18 +32,17 @@ pipeline {
 
         stage('Test') {
             steps {
-                echo 'Running unit tests'
                 bat "%VENV%\\Scripts\\pytest"
             }
         }
 
-        stage('Run Flask App') {
+        stage('Run Calculator') {
             steps {
-                echo 'Starting Flask app in background and opening Chrome'
                 bat """
-                start /B cmd /c "%VENV%\\Scripts\\python app.py"
-                ping 127.0.0.1 -n 6 > nul
-                start chrome http://127.0.0.1:5000
+                set NUMBER1=%NUMBER1%
+                set NUMBER2=%NUMBER2%
+                set OPERATION=%OPERATION%
+                %VENV%\\Scripts\\python app.py
                 """
             }
         }
@@ -46,7 +50,7 @@ pipeline {
 
     post {
         success {
-            echo '✅ Pipeline completed successfully!'
+            echo '✅ Flask app started. Open http://localhost:5000 manually.'
         }
         failure {
             echo '❌ Pipeline failed!'
