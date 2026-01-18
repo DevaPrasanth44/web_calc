@@ -27,17 +27,17 @@ pipeline {
 
         stage('Test') {
             steps {
-                echo 'Running unit tests using pytest'
+                echo 'Running unit tests'
                 bat "%VENV%\\Scripts\\pytest"
             }
         }
 
         stage('Run Flask App') {
             steps {
-                echo 'Starting Flask web calculator'
+                echo 'Starting Flask app in background and opening Chrome'
                 bat """
-                start cmd /k "%VENV%\\Scripts\\python app.py"
-                timeout /t 5
+                start /B cmd /c "%VENV%\\Scripts\\python app.py"
+                ping 127.0.0.1 -n 6 > nul
                 start chrome http://127.0.0.1:5000
                 """
             }
