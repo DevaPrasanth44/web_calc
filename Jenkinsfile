@@ -3,11 +3,18 @@ pipeline {
 
     environment {
         VENV = "venv"
-        PYTHON = "C:\\Users\\Deva\\AppData\\Local\\Programs\\Python\\Python313\\python.exe"
+        PYTHON_PATH = "C:\\Users\\Deva\\AppData\\Local\\Programs\\Python\\Python313\\python.exe"
+    }
+
+    parameters {
+        string(name: 'NUMBER1', defaultValue: '0', description: 'First number')
+        string(name: 'NUMBER2', defaultValue: '0', description: 'Second number')
+        choice(name: 'OPERATION', choices: ['add', 'subtract', 'multiply', 'divide'], description: 'Operation')
     }
 
     stages {
-        stage('Checkout') {
+
+        stage('Checkout Code') {
             steps {
                 checkout scm
             }
@@ -16,7 +23,7 @@ pipeline {
         stage('Build') {
             steps {
                 bat """
-                "%PYTHON%" -m venv %VENV%
+                ${PYTHON_PATH} -m venv %VENV%
                 %VENV%\\Scripts\\python -m pip install --upgrade pip
                 %VENV%\\Scripts\\pip install -r requirements.txt
                 """
@@ -25,8 +32,17 @@ pipeline {
 
         stage('Test') {
             steps {
+                bat "%VENV%\\Scripts\\pytest"
+            }
+        }
+
+        stage('Run Calculator') {
+            steps {
                 bat """
-                %VENV%\\Scripts\\pytest
+                set NUMBER1=%NUMBER1%
+                set NUMBER2=%NUMBER2%
+                set OPERATION=%OPERATION%
+                %VENV%\\Scripts\\python run_calculator.py
                 """
             }
         }
@@ -34,7 +50,10 @@ pipeline {
 
     post {
         success {
-            echo "✅ Build & Tests successful"
+            echo '✅ Pipeline completed successfully!'
+        }
+        failure {
+            echo '❌ Pipeline failed!'
         }
     }
 }

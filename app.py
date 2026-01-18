@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request
-from calculator import add, subtract, multiply, divide
+from calculator import calculate
 
 app = Flask(__name__)
 
@@ -8,20 +8,12 @@ def index():
     result = None
 
     if request.method == "POST":
-        a = int(request.form["number1"])
-        b = int(request.form["number2"])
+        num1 = request.form["num1"]
+        num2 = request.form["num2"]
         operation = request.form["operation"]
-
-        if operation == "add":
-            result = add(a, b)
-        elif operation == "subtract":
-            result = subtract(a, b)
-        elif operation == "multiply":
-            result = multiply(a, b)
-        elif operation == "divide":
-            result = divide(a, b)
+        result = calculate(num1, num2, operation)
 
     return render_template("index.html", result=result)
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=True)

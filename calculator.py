@@ -1,13 +1,16 @@
-def add(a, b):
-    return a + b
+def calculate(a, b, operation):
+    a = float(a)
+    b = float(b)
 
-def subtract(a, b):
-    return a - b
-
-def multiply(a, b):
-    return a * b
-
-def divide(a, b):
-    if b == 0:
-        raise ValueError("Cannot divide by zero")
-    return a / b
+    if operation == "add":
+        return a + b
+    elif operation == "subtract":
+        return a - b
+    elif operation == "multiply":
+        return a * b
+    elif operation == "divide":
+        if b == 0:
+            return "Cannot divide by zero"
+        return a / b
+    else:
+        return "Invalid operation"
