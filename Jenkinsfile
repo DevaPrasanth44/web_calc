@@ -6,12 +6,6 @@ pipeline {
         PYTHON_PATH = "C:\\Users\\Deva\\AppData\\Local\\Programs\\Python\\Python313\\python.exe"
     }
 
-    parameters {
-        string(name: 'NUMBER1', defaultValue: '0', description: 'First number')
-        string(name: 'NUMBER2', defaultValue: '0', description: 'Second number')
-        choice(name: 'OPERATION', choices: ['add', 'subtract', 'multiply', 'divide'], description: 'Operation')
-    }
-
     stages {
 
         stage('Checkout Code') {
@@ -22,8 +16,9 @@ pipeline {
 
         stage('Build') {
             steps {
+                echo 'Creating virtual environment and installing dependencies'
                 bat """
-                ${PYTHON_PATH} -m venv %VENV%
+                %PYTHON_PATH% -m venv %VENV%
                 %VENV%\\Scripts\\python -m pip install --upgrade pip
                 %VENV%\\Scripts\\pip install -r requirements.txt
                 """
@@ -32,17 +27,18 @@ pipeline {
 
         stage('Test') {
             steps {
+                echo 'Running unit tests using pytest'
                 bat "%VENV%\\Scripts\\pytest"
             }
         }
 
-        stage('Run Calculator') {
+        stage('Run Flask App') {
             steps {
+                echo 'Starting Flask web calculator'
                 bat """
-                set NUMBER1=%NUMBER1%
-                set NUMBER2=%NUMBER2%
-                set OPERATION=%OPERATION%
-                %VENV%\\Scripts\\python run_calculator.py
+                start cmd /k "%VENV%\\Scripts\\python app.py"
+                timeout /t 5
+                start chrome http://127.0.0.1:5000
                 """
             }
         }
